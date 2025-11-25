@@ -29,7 +29,11 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Delete
         protected override async ValueTask<UseCaseResponse<Unit>> ExecuteLogic(Guid id)
         {
             var entity = await _findByIdRepository.Find(id);
-            Ensure.NotNull(entity, _ => EntityToDeleteNotFoundException.CreateFromId(id));
+            if (entity is null)
+            {
+                _logger.LogWarning($"Entity of type {typeof(TEntity).Name} with id {id} not found");
+                return UseCaseResponse.Empty();
+            }
 
             _logger.LogInformation($"Deleting entity of type {typeof(TEntity).Name} with id {id}");
             await ProcessRequest(entity!);
