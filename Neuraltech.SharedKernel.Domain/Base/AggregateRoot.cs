@@ -1,15 +1,21 @@
-
 using Neuraltech.SharedKernel.Domain.ValueObjects;
 
 namespace Neuraltech.SharedKernel.Domain.Base;
 
-public abstract class AggregateRoot : Entity
+public abstract class AggregateRoot : AggregateRoot<UuidValueObject>
 {
-    public UuidValueObject Id { get; init; }
+    protected AggregateRoot(UuidValueObject id) : base(id)
+    {
+    }
+}
+
+public abstract class AggregateRoot<TId> : Entity
+{
+    public TId Id { get; init; }
 
     private readonly List<BaseEvent> _domainEvents = new();
     
-    protected AggregateRoot(UuidValueObject id)
+    protected AggregateRoot(TId id)
     {
         Id = id;
     }

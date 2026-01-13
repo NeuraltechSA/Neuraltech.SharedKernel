@@ -13,6 +13,42 @@ namespace Neuraltech.SharedKernel.Domain.Services
             }
         }
 
+        public static void StartsWith(string value, string prefix, Func<string, string, Exception>? exceptionFactory = null)
+        {
+            if (!value.StartsWith(prefix))
+            {
+                var exception = exceptionFactory?.Invoke(value, prefix) ?? InvalidStringFormatException.CreateStartsWith(value, prefix);
+                throw exception;
+            }
+        }
+
+        public static void EndsWith(string value, string suffix, Func<string, string, Exception>? exceptionFactory = null)
+        {
+            if (!value.EndsWith(suffix))
+            {
+                var exception = exceptionFactory?.Invoke(value, suffix) ?? InvalidStringFormatException.CreateEndsWith(value, suffix);
+                throw exception;
+            }
+        }
+
+        public static void StringContains(string value, string substring, Func<string, string, Exception>? exceptionFactory = null)
+        {
+            if (!value.Contains(substring))
+            {
+                var exception = exceptionFactory?.Invoke(value, substring) ?? InvalidStringFormatException.CreateContains(value, substring);
+                throw exception;
+            }
+        }
+
+        public static void StringNotContains(string value, string substring, Func<string, string, Exception>? exceptionFactory = null)
+        {
+            if (value.Contains(substring))
+            {
+                var exception = exceptionFactory?.Invoke(value, substring) ?? InvalidStringFormatException.CreateNotContains(value, substring);
+                throw exception;
+            }
+        }
+
         public static void InRange<T>(
             T value, T min, T max, Func<T, T, T, Exception>? exceptionFactory = null)
             where T : IComparable<T>
@@ -20,6 +56,50 @@ namespace Neuraltech.SharedKernel.Domain.Services
             if(value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
             {
                 var exception = exceptionFactory?.Invoke(value, min, max) ?? ValueOutOfRangeException.Create(value, min, max);
+                throw exception;
+            }
+        }
+
+        public static void GreaterOrEqualThan<T>(
+            T value, T minimum, Func<T, T, Exception>? exceptionFactory = null)
+            where T : IComparable<T>
+        {
+            if (value.CompareTo(minimum) < 0)
+            {
+                var exception = exceptionFactory?.Invoke(value, minimum) ?? ValueOutOfRangeException.CreateGreaterOrEqualThan(value, minimum);
+                throw exception;
+            }
+        }
+
+        public static void LessOrEqualThan<T>(
+            T value, T maximum, Func<T, T, Exception>? exceptionFactory = null)
+            where T : IComparable<T>
+        {
+            if (value.CompareTo(maximum) > 0)
+            {
+                var exception = exceptionFactory?.Invoke(value, maximum) ?? ValueOutOfRangeException.CreateLessOrEqualThan(value, maximum);
+                throw exception;
+            }
+        }
+
+        public static void GreaterThan<T>(
+            T value, T minimum, Func<T, T, Exception>? exceptionFactory = null)
+            where T : IComparable<T>
+        {
+            if (value.CompareTo(minimum) <= 0)
+            {
+                var exception = exceptionFactory?.Invoke(value, minimum) ?? ValueOutOfRangeException.CreateGreaterThan(value, minimum);
+                throw exception;
+            }
+        }
+
+        public static void LessThan<T>(
+            T value, T maximum, Func<T, T, Exception>? exceptionFactory = null)
+            where T : IComparable<T>
+        {
+            if (value.CompareTo(maximum) >= 0)
+            {
+                var exception = exceptionFactory?.Invoke(value, maximum) ?? ValueOutOfRangeException.CreateLessThan(value, maximum);
                 throw exception;
             }
         }

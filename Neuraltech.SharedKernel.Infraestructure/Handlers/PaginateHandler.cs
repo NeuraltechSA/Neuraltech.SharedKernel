@@ -11,8 +11,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Handlers
             PaginateUseCase<TEntity, TCriteria> useCase
         ) : ControllerBase
         where TRequest : PaginateRequestDTO
-        where TEntity : AggregateRoot
         where TCriteria : BaseCriteria<TCriteria>
+        where TEntity : AggregateRoot
     {
         private readonly PaginateUseCase<TEntity, TCriteria> _useCase = useCase;
         protected abstract TResponseEntity MapResponseEntity(TEntity entity);

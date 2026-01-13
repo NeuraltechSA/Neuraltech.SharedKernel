@@ -1,5 +1,4 @@
-﻿
-using Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Models;
+﻿using Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Models;
 using Neuraltech.SharedKernel.Infraestructure.Persistence.Contracts;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Neuraltech.SharedKernel.Domain.Base.Criteria;
@@ -32,9 +31,9 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         protected readonly DbSet<TModel> _dbSet;
         
         /// <summary>
-        /// Convertidor de criterios de dominio a consultas de EF Core
+        /// Convertidor de criterios de dominio a consultas de Linq
         /// </summary>
-        protected readonly EFCoreCriteriaConverter _efCoreCriteriaConverter;
+        protected readonly LinqCriteriaConverter _linqCriteriaConverter;
         
         /// <summary>
         /// Parser para conversión entre entidades de dominio y modelos de persistencia
@@ -45,14 +44,24 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// Constructor del repositorio base
         /// </summary>
         /// <param name="context">Contexto de Entity Framework Core</param>
-        /// <param name="efCoreCriteriaConverter">Convertidor de criterios</param>
+        /// <param name="linqCriteriaConverter">Convertidor de criterios</param>
         /// <param name="modelParser">Parser de modelos</param>
-        public BaseEFCoreRepository(DbContext context, EFCoreCriteriaConverter efCoreCriteriaConverter, IMapper<TEntity, TModel> modelParser)
+        public BaseEFCoreRepository(DbContext context, LinqCriteriaConverter linqCriteriaConverter, IMapper<TEntity, TModel> modelParser)
         {
             _context = context;
             _dbSet = _context.Set<TModel>();
-            _efCoreCriteriaConverter = efCoreCriteriaConverter;
+            _linqCriteriaConverter = linqCriteriaConverter;
             _modelParser = modelParser;
+        }
+
+        /// <summary>
+        /// Obtiene la query base para las operaciones de lectura.
+        /// Puede ser sobrescrito para aplicar filtros por defecto (ej: discriminador de tipo en herencia TPH).
+        /// </summary>
+        /// <returns>Query base con filtros por defecto aplicados</returns>
+        protected virtual IQueryable<TModel> GetBaseQuery()
+        {
+            return _dbSet;
         }
         
         /// <summary>
@@ -91,9 +100,9 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// </summary>
         /// <param name="id">Identificador de la entidad</param>
         /// <returns>Entidad encontrada o null si no existe</returns>
-        public async ValueTask<TEntity?> Find(Guid id){
+        public virtual async ValueTask<TEntity?> Find(Guid id){
             // AsNoTracking() mejora rendimiento y reduce uso de memoria al no rastrear cambios
-            var result = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var result = await GetBaseQuery().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return result == null ? null : _modelParser.MapToEntity(result);
         }
 
@@ -105,13 +114,13 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// <returns>Colección de entidades que cumplen el criterio</returns>
         public async ValueTask<IEnumerable<TEntity>> Find(TCriteria criteria){
             // AsNoTracking() mejora rendimiento al no necesitar seguimiento de cambios para consultas de lectura
-            var items = await _efCoreCriteriaConverter.Apply(criteria, _dbSet).AsNoTracking().ToListAsync();
+            var items = await _linqCriteriaConverter.Apply(criteria, GetBaseQuery()).AsNoTracking().ToListAsync();
             return items.Select(_modelParser.MapToEntity);
         }
 
         public async ValueTask<long> Count(TCriteria criteria)
         {
-            return await _efCoreCriteriaConverter.Apply(criteria, _dbSet).LongCountAsync();
+            return await _linqCriteriaConverter.Apply(criteria, GetBaseQuery()).LongCountAsync();
         }
     }
 }

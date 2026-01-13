@@ -2,17 +2,24 @@
 using MassTransit;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Neuraltech.SharedKernel.Domain.Base;
+using MassTransit.DependencyInjection;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Services.MassTransit
 {
     public class EventBus : IEventBus
     {
-        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IPublishEndpoint _memoryPublishEndpoint;
+        private readonly Bind<IKafkaBus, IPublishEndpoint> _kafkaPublishEndpoint;
         private readonly ILogger<EventBus> _logger;
 
-        public EventBus(IPublishEndpoint publishEndpoint, ILogger<EventBus> logger)
+        public EventBus(
+            IPublishEndpoint memoryPublishEndpoint,
+            Bind<IKafkaBus, IPublishEndpoint> kafkaPublishEndpoint,
+            ILogger<EventBus> logger
+        )
         {
-            _publishEndpoint = publishEndpoint;
+            _memoryPublishEndpoint = memoryPublishEndpoint;
+            _kafkaPublishEndpoint = kafkaPublishEndpoint;
             _logger = logger;
         }
 
@@ -22,17 +29,35 @@ namespace Neuraltech.SharedKernel.Infraestructure.Services.MassTransit
         }
         public async ValueTask Publish<TEvent>(IEnumerable<TEvent> events) where TEvent : BaseEvent
         {
-            foreach (var @event in events)
+            foreach(var @event in events)
             {
-                _logger.LogInformation("Publishing event: {Event}", @event.GetType().Name);
-                await _publishEndpoint.Publish(@event, @event.GetType(), context =>
+                if (@event is IntegrationEvent integrationEvent)
                 {
-                    context.SetRoutingKey(@event.MessageName);
-                });
-                _logger.LogInformation("Event published: {Event}", @event.GetType().Name);
+                    await PublishToKafka(integrationEvent);
+                }
+                else
+                {
+                    await PublishToMemory(@event);
+                }
             }
         }
+        private async ValueTask PublishToKafka<TEvent>(TEvent @event) where TEvent : IntegrationEvent
+        {
+            _logger.LogInformation("Publishing event to Kafka: {Event}", @event.GetType().Name);
+            await _kafkaPublishEndpoint.Value.Publish(@event, @event.GetType(), context =>
+            {
+                context.SetRoutingKey(@event.MessageName);
+            });
+            _logger.LogInformation("Event published to Kafka: {Event}", @event.GetType().Name);
+        }
 
-        
+        private async ValueTask PublishToMemory<TEvent>(TEvent @event) where TEvent : BaseEvent
+        {
+            _logger.LogInformation("Publishing event to In-Memory: {Event}", @event.GetType().Name);
+            await _memoryPublishEndpoint.Publish(@event, @event.GetType());
+            _logger.LogInformation("Event published to In-Memory: {Event}", @event.GetType().Name);
+        }
+
+
     }
 }

@@ -1,7 +1,16 @@
 namespace Neuraltech.SharedKernel.Domain.Base.Criteria.Ordering;
 
-public sealed record OrderBy(string Value)
+public sealed record OrderBy
 {
+    public string Value { get; init; }
 
-    public static OrderBy Create(string value) => new OrderBy(value);
+    private OrderBy(string value)
+    {
+        Value = value;
+    }
+
+    public static OrderBy Create(string propertyName)
+    {
+        return new OrderBy(propertyName);
+    }
 }

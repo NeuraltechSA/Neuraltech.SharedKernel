@@ -8,19 +8,10 @@ using Neuraltech.SharedKernel.Infraestructure.Attributes;
 namespace Neuraltech.SharedKernel.Infraestructure.Handlers
 {
     public abstract class CreateHandler<TRequest, TUseCaseRequest, TEntity>
-        (CreateUseCase<TUseCaseRequest, TEntity> useCase)
-    : CreateHandler<TRequest, TUseCaseRequest, TEntity, TEntity>(useCase)
+        (CreateUseCase<TUseCaseRequest, TEntity> useCase) : ControllerBase
         where TEntity : AggregateRoot
     {
-
-    }
-
-    public abstract class CreateHandler<TRequest, TUseCaseRequest, TEntity, TBaseEntity>
-        (CreateUseCase<TUseCaseRequest, TBaseEntity, TEntity> useCase) : ControllerBase
-        where TBaseEntity : AggregateRoot
-        where TEntity : TBaseEntity
-    {
-        CreateUseCase<TUseCaseRequest, TBaseEntity, TEntity> _useCase = useCase;
+        CreateUseCase<TUseCaseRequest, TEntity> _useCase = useCase;
 
         protected abstract TUseCaseRequest MapUseCaseRequest(TRequest request);
 

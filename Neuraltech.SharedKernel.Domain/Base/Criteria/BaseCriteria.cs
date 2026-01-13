@@ -1,10 +1,10 @@
-using Neuraltech.SharedKernel.Domain.Base.Criteria.Fields;
 using Neuraltech.SharedKernel.Domain.Base.Criteria.Filtering;
 using Neuraltech.SharedKernel.Domain.Base.Criteria.Ordering;
 
 namespace Neuraltech.SharedKernel.Domain.Base.Criteria;
 
-public class BaseCriteria<T> where T : BaseCriteria<T>
+public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
+    where T : BaseCriteria<T>
 {
     protected Pagination? Pagination { get; set; }
     protected Filters Filters { get; set; }
@@ -29,7 +29,6 @@ public class BaseCriteria<T> where T : BaseCriteria<T>
         return (T)this;
     }
 
-    public bool HasPagination => Pagination != null;
 
     public long? GetPageSize() => Pagination?.Size;
 
@@ -37,26 +36,33 @@ public class BaseCriteria<T> where T : BaseCriteria<T>
 
     public long? GetPageNumberFromZero() => Pagination?.Page - 1;
 
-    public T AddFilter(string field, FilterOperators op, object? value)
+    public T AddFilter(string fieldName, FilterOperators op, object? value)
     {
-        var newFilter = Filter.Create(field, op, value);
+        var newFilter = Filter.Create(fieldName, op, value);
         var newFilters = new List<Filter>(Filters.Value) { newFilter };
         Filters = new Filters(newFilters);
         return (T)this;
     }
 
-    public T AddOrder(string orderBy, OrderTypes orderType)
+    public T AddOrder(string propertyName, OrderTypes orderType)
     {
-        var newOrder = Order.Create(orderBy, orderType);
+        var newOrder = Order.Create(propertyName, orderType);
         var newOrders = new List<Order>(Orders.Value) { newOrder };
         Orders = new Orders(newOrders);
         return (T)this;
     }
     
-    public bool HasOrder => Orders.Value.Any();
-
     public List<Filter> GetFilters() => Filters.Value;
 
     public List<Order> GetOrders() => Orders.Value;
 
+    public bool HasPagination()
+    {
+        return Pagination != null;
+    }
+
+    public bool HasOrder()
+    {
+        return Orders.Value.Any();
+    }
 }

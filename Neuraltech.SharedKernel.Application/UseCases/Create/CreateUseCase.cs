@@ -3,11 +3,7 @@ using Neuraltech.SharedKernel.Application.UseCases.Base;
 using Neuraltech.SharedKernel.Domain.Base;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Neuraltech.SharedKernel.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
- 
+
 
 namespace Neuraltech.SharedKernel.Application.UseCases.Create
 {
@@ -16,21 +12,10 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Create
         ICreateRepository<TEntity> repository,
         IEventBus eventBus,
         IUnitOfWork unitOfWork
-    ) : CreateUseCase<TRequest, TEntity, TEntity>(logger, repository, eventBus, unitOfWork)
-        where TEntity : AggregateRoot
-    { 
-    }
-
-    public abstract class CreateUseCase<TRequest, TBaseEntity, TEntity>(
-        ILogger logger,
-        ICreateRepository<TBaseEntity> repository,
-        IEventBus eventBus,
-        IUnitOfWork unitOfWork
     ) : BaseUseCase<TRequest>(logger)
-        where TBaseEntity : AggregateRoot
-        where TEntity : TBaseEntity
+        where TEntity : AggregateRoot
     {
-        private readonly ICreateRepository<TBaseEntity> _repository = repository;
+        private readonly ICreateRepository<TEntity> _repository = repository;
         protected readonly IEventBus _eventBus = eventBus;
         protected readonly IUnitOfWork _unitOfWork = unitOfWork;
         
@@ -55,7 +40,6 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Create
                 }
                 throw;
             }
-
         }
     }
 }

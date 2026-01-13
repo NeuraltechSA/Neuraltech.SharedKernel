@@ -3,7 +3,6 @@ using Neuraltech.SharedKernel.Application.UseCases.Base;
 using Neuraltech.SharedKernel.Domain.Base;
 using Neuraltech.SharedKernel.Domain.Base.Criteria;
 using Neuraltech.SharedKernel.Domain.Contracts;
-using Neuraltech.SharedKernel.Domain.Exceptions;
 using Neuraltech.SharedKernel.Domain.Services;
 
 
@@ -12,23 +11,22 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Paginate
     public abstract class PaginateUseCase<TEntity, TCriteria>(
         ILogger logger,
         IPaginateRepository<TEntity, TCriteria> repository
-    ) : PaginateUseCase<BaseCriteria<TCriteria>, TEntity, TCriteria >(logger, repository)
+    ) : PaginateUseCase<TEntity, TCriteria, TCriteria>(logger, repository)
         where TEntity : AggregateRoot
-        where TCriteria : BaseCriteria<TCriteria>
+        where TCriteria : IPaginable<TCriteria>
     {
-        protected override TCriteria MapCriteria(BaseCriteria<TCriteria> request)
+        protected override TCriteria MapCriteria(TCriteria request)
         {
-            return (TCriteria)request;
+            return request;
         }
-         
     }
 
-    public abstract class PaginateUseCase<TRequest, TEntity, TCriteria>(
+    public abstract class PaginateUseCase<TEntity, TCriteria, TRequest>(
         ILogger logger,
         IPaginateRepository<TEntity, TCriteria> repository
     ) : BaseUseCase<TRequest, PaginateResultDTO<TEntity>>(logger)
+        where TCriteria : IPaginable<TCriteria>
         where TEntity : AggregateRoot
-        where TCriteria : BaseCriteria<TCriteria>
     {
         protected long DefaultPage = 1;
         protected long DefaultPageSize = 20;
@@ -36,10 +34,13 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Paginate
 
         private readonly IPaginateRepository<TEntity, TCriteria> _repository = repository;
         protected abstract TCriteria MapCriteria(TRequest request);
-        protected override async ValueTask<UseCaseResponse<PaginateResultDTO<TEntity>>> ExecuteLogic(TRequest request)
+
+        protected override async ValueTask<UseCaseResponse<PaginateResultDTO<TEntity>>> 
+            ExecuteLogic(TRequest request)
         {
             var criteria = MapCriteria(request);
 
+            SetDefaultPagination(criteria);
             EnsureMaxPageSize(criteria);
 
             var items = await _repository.Find(criteria);
@@ -51,19 +52,26 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Paginate
             {
                 Items = items,
                 Count = count,
-                Page = criteria.GetPageNumber() ?? DefaultPage,
-                PageSize = criteria.GetPageSize() ?? DefaultPageSize
+                Page = (long)criteria.GetPageNumber()!,
+                PageSize = (long)criteria.GetPageSize()!
             });
         }
 
-        private void EnsureMaxPageSize(BaseCriteria<TCriteria> criteria)
+        private TCriteria SetDefaultPagination(TCriteria criteria)
         {
-            if (criteria.HasPagination)
+            if (!criteria.HasPagination())
+            {
+                criteria.Paginate(DefaultPage, DefaultPageSize);
+            }
+            return criteria;
+        }
+
+        private void EnsureMaxPageSize(TCriteria criteria)
+        {
+            if (criteria.HasPagination())
             {
                 Ensure.InRange((long)criteria.GetPageSize()!, 0, MaxPageSize);
             }
-
         }
-
     }
 }

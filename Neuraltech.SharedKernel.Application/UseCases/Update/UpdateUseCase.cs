@@ -6,31 +6,17 @@ using Neuraltech.SharedKernel.Domain.Services;
 
 namespace Neuraltech.SharedKernel.Application.UseCases.Update
 {
-
     public abstract class UpdateUseCase<TRequest, TEntity>(
         ILogger logger,
         IFindByIdRepository<TEntity> findByIdRepository,
         IUpdateRepository<TEntity> repository,
         IEventBus eventBus,
         IUnitOfWork unitOfWork
-    ) : UpdateUseCase<TRequest, TEntity, TEntity>(logger, findByIdRepository, repository, eventBus, unitOfWork)
+    ) : BaseUseCase<TRequest>(logger)
         where TRequest : UpdateDTO
         where TEntity : AggregateRoot
     {
-    }
-
-    public abstract class UpdateUseCase<TRequest, TBaseEntity, TEntity>(
-        ILogger logger,
-        IFindByIdRepository<TEntity> findByIdRepository,
-        IUpdateRepository<TBaseEntity> repository,
-        IEventBus eventBus,
-        IUnitOfWork unitOfWork
-    ) : BaseUseCase<TRequest>(logger)
-        where TRequest : UpdateDTO
-        where TBaseEntity : AggregateRoot
-        where TEntity : TBaseEntity
-    {
-        private readonly IUpdateRepository<TBaseEntity> _repository = repository;
+        private readonly IUpdateRepository<TEntity> _repository = repository;
         private readonly IEventBus _eventBus = eventBus;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IFindByIdRepository<TEntity> _findByIdRepository = findByIdRepository;
@@ -51,6 +37,5 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Update
 
             return UseCaseResponse.Empty();
         }
-
     }
 }

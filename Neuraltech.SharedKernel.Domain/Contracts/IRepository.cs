@@ -1,6 +1,5 @@
-
 using Neuraltech.SharedKernel.Domain.Base;
-using Neuraltech.SharedKernel.Domain.ValueObjects;
+using Neuraltech.SharedKernel.Domain.Base.Criteria;
 
 namespace Neuraltech.SharedKernel.Domain.Contracts;
 
@@ -11,6 +10,6 @@ public interface IRepository<TEntity, TCriteria> :
     IUpdateRepository<TEntity>,
     IDeleteRepository<TEntity>
     where TEntity : Entity
-    where TCriteria : class
+    where TCriteria : IPaginable<TCriteria>
 {
 }
