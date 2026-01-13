@@ -202,5 +202,14 @@ namespace Neuraltech.SharedKernel.Domain.Services
                 throw exception;
             }
         }
+
+        public static void StartsWith(string? value, string prefix, Func<string?, string, Exception>? exceptionFactory = null)
+        {
+            if (value is null || !value.StartsWith(prefix))
+            {
+                var exception = exceptionFactory?.Invoke(value, prefix) ?? InvalidPrefixException.Create(value ?? string.Empty, prefix);
+                throw exception;
+            }
+        }
     }
 }
