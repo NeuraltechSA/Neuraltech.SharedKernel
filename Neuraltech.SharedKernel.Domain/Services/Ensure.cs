@@ -1,4 +1,5 @@
 ﻿using Neuraltech.SharedKernel.Domain.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace Neuraltech.SharedKernel.Domain.Services
 {
@@ -13,14 +14,6 @@ namespace Neuraltech.SharedKernel.Domain.Services
             }
         }
 
-        public static void StartsWith(string value, string prefix, Func<string, string, Exception>? exceptionFactory = null)
-        {
-            if (!value.StartsWith(prefix))
-            {
-                var exception = exceptionFactory?.Invoke(value, prefix) ?? InvalidStringFormatException.CreateStartsWith(value, prefix);
-                throw exception;
-            }
-        }
 
         public static void EndsWith(string value, string suffix, Func<string, string, Exception>? exceptionFactory = null)
         {
@@ -210,6 +203,25 @@ namespace Neuraltech.SharedKernel.Domain.Services
                 var exception = exceptionFactory?.Invoke(value, prefix) ?? InvalidPrefixException.Create(value ?? string.Empty, prefix);
                 throw exception;
             }
+        }
+
+        public static Match Matches(string? value, string pattern, Func<string?, string, Exception>? exceptionFactory = null)
+        {
+            if (value is null)
+            {
+                var exception = exceptionFactory?.Invoke(value, pattern) ?? InvalidStringFormatException.CreatePattern(string.Empty, pattern);
+                throw exception;
+            }
+
+            var match = Regex.Match(value, pattern);
+            
+            if (!match.Success)
+            {
+                var exception = exceptionFactory?.Invoke(value, pattern) ?? InvalidStringFormatException.CreatePattern(value, pattern);
+                throw exception;
+            }
+
+            return match;
         }
     }
 }

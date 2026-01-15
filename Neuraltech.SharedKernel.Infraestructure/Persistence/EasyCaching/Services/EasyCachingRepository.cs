@@ -15,6 +15,7 @@ public abstract class EasyCachingRepository<TEntity, TCriteria, TKey>(
     ICreateRepository<TEntity>,
     IUpdateRepository<TEntity>,
     IDeleteRepository<TEntity>,
+    IFindByIdRepository<TEntity>,
     IPaginateRepository<TEntity, TCriteria>
     where TEntity : Entity
     where TCriteria : BaseCriteria<TCriteria>
@@ -25,6 +26,7 @@ public abstract class EasyCachingRepository<TEntity, TCriteria, TKey>(
     protected abstract string KeyPrefix { get; }
     protected abstract TKey GetEntityKey(TEntity entity);
     private string GetKey(TEntity entity) => $"{KeyPrefix}:{GetEntityKey(entity)}";
+    private string GetKey(TKey key) => $"{KeyPrefix}:{key}";
 
     public virtual async ValueTask Create(TEntity entity)
     {
@@ -50,6 +52,14 @@ public abstract class EasyCachingRepository<TEntity, TCriteria, TKey>(
         var key = GetKey(entity);
         await _cachingProvider.RemoveAsync(key);
     }
+
+    public virtual async ValueTask<TEntity?> Find(Guid id)
+    {
+        var key = GetKey((TKey)(object)id);
+        var cached = await _cachingProvider.GetAsync<TEntity>(key);
+        return cached.HasValue ? cached.Value : null;
+    }
+
     protected async ValueTask<IEnumerable<TEntity>> GetAll()
     {
         var keys = await _cachingProvider.GetAllKeysByPrefixAsync(KeyPrefix);
@@ -57,6 +67,7 @@ public abstract class EasyCachingRepository<TEntity, TCriteria, TKey>(
         var items =  _cachingProvider.GetAll<TEntity>(keys).Select(kv => kv.Value.Value);
         return items;
     }
+    
     public async ValueTask<IEnumerable<TEntity>> Find(TCriteria criteria)
     {
         //TODO: CancellationToken

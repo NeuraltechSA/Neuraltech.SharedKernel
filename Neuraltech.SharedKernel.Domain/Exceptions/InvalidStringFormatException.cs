@@ -25,5 +25,10 @@ namespace Neuraltech.SharedKernel.Domain.Exceptions
         {
             return new InvalidStringFormatException($"The value '{value}' should not contain '{substring}'.");
         }
+
+        public static InvalidStringFormatException CreatePattern(string value, string pattern)
+        {
+            return new InvalidStringFormatException($"The value '{value}' does not match the required pattern '{pattern}'.");
+        }
     }
 }
