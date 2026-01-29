@@ -14,7 +14,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Handlers
         DeleteUseCase<TEntity> useCase,
         ILogger logger
     ) : ControllerBase
-        where TEntity : AggregateRoot, IDeletable
+        where TEntity : AggregateRoot
     {
         private readonly DeleteUseCase<TEntity> _useCase = useCase;
         private readonly ILogger _logger = logger;

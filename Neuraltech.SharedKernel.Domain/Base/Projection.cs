@@ -1,6 +1,6 @@
 namespace Neuraltech.SharedKernel.Domain.Base
 {
-    public abstract record Projection : IntegrationEvent
+    public abstract class Projection : IntegrationEvent
     {
         /// <summary>
         /// Timestamp de cuando se creó la proyección.

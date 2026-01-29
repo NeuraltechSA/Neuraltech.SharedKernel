@@ -183,7 +183,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
         {
             var entities = await GetAll();
             var query = entities.AsQueryable();
-            return await _criteriaConverter.Apply(criteria, query).LongCountAsync();
+            //TODO: Async ?
+            return _criteriaConverter.Apply(criteria, query).LongCount();
         }
 
         /// <summary>

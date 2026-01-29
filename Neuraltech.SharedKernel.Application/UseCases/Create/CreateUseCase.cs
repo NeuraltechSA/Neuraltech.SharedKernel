@@ -7,6 +7,24 @@ using Neuraltech.SharedKernel.Domain.Exceptions;
 
 namespace Neuraltech.SharedKernel.Application.UseCases.Create
 {
+    public abstract class CreateUseCase<TEntity>(
+        ILogger logger,
+        ICreateRepository<TEntity> repository,
+        IEventBus eventBus,
+        IUnitOfWork unitOfWork
+    ) : CreateUseCase<TEntity, TEntity>(
+        logger,
+        repository,
+        eventBus,
+        unitOfWork
+    ) where TEntity : AggregateRoot
+    {
+        protected override ValueTask<TEntity> ProcessRequest(TEntity request)
+        {
+            return ValueTask.FromResult(request);
+        }
+    }
+
     public abstract class CreateUseCase<TRequest, TEntity>(
         ILogger logger,
         ICreateRepository<TEntity> repository,

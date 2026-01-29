@@ -31,4 +31,5 @@ public abstract class AggregateRoot<TId> : Entity
         _domainEvents.Clear();
         return events;
     }
+
 }

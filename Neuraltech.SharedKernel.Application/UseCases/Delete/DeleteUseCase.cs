@@ -6,6 +6,15 @@ using Neuraltech.SharedKernel.Domain.Services;
 
 namespace Neuraltech.SharedKernel.Application.UseCases.Delete
 {
+    /*
+     
+        {
+            entity.Delete();
+            return ValueTask.CompletedTask;
+        }
+     */
+
+
     public abstract class DeleteUseCase<TEntity>(
         ILogger logger,
         IFindByIdRepository<TEntity> findByIdRepository,
@@ -13,7 +22,7 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Delete
         IEventBus eventBus,
         IUnitOfWork unitOfWork
     ) : BaseUseCase<Guid>(logger)
-        where TEntity : AggregateRoot, IDeletable
+        where TEntity : AggregateRoot
     {
         private readonly IDeleteRepository<TEntity> _repository = repository;
         private readonly IEventBus _eventBus = eventBus;
@@ -22,7 +31,6 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Delete
 
         protected virtual ValueTask ProcessRequest(TEntity entity)
         {
-            entity.Delete();
             return ValueTask.CompletedTask;
         }
 
@@ -36,10 +44,15 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Delete
             }
 
             _logger.LogInformation($"Deleting entity of type {typeof(TEntity).Name} with id {id}");
+
             await ProcessRequest(entity!);
+
+            if (entity is IDeletable deletableEntity) deletableEntity.Delete();
+
             await _repository.Delete(entity!);
             await _eventBus.Publish(entity!.PullDomainEvents());
             await _unitOfWork.SaveChangesAsync();
+
             _logger.LogInformation($"Entity of type {typeof(TEntity).Name} with id {id} deleted successfully");
 
             return UseCaseResponse.Empty();
