@@ -22,6 +22,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Handlers
                 .Create()
                 .Paginate(request.Page, request.Limit);
         }
+
         public virtual async ValueTask<IActionResult> Paginate([FromQuery] TRequest request)
         {
             var criteria = MapCriteria(request);

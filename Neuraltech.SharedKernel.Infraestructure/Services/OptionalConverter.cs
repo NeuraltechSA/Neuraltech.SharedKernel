@@ -1,4 +1,4 @@
-﻿using Neuraltech.SharedKernel.Application.UseCases.Update;
+﻿using Neuraltech.SharedKernel.Domain.Base;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

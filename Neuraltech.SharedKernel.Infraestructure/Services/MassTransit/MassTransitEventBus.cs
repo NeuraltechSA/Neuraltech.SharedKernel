@@ -6,18 +6,18 @@ using MassTransit.DependencyInjection;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Services.MassTransit
 {
-    public class EventBus : IEventBus
+    public class MassTransitEventBus : IEventBus
     {
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ITopicProducerProvider _producerProvider;
         //private readonly Bind<IKafkaBus, IPublishEndpoint> _kafkaPublishEndpoint;
-        private readonly ILogger<EventBus> _logger;
+        private readonly ILogger<MassTransitEventBus> _logger;
 
-        public EventBus(
+        public MassTransitEventBus(
             IPublishEndpoint publishEndpoint,
             ITopicProducerProvider producerProvider,
             //Bind<IKafkaBus, IPublishEndpoint> kafkaPublishEndpoint,
-            ILogger<EventBus> logger
+            ILogger<MassTransitEventBus> logger
         )
         {
             _publishEndpoint = publishEndpoint;

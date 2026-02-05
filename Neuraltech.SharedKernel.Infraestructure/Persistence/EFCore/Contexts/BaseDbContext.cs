@@ -1,14 +1,11 @@
-﻿using MassTransit;
+﻿//using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Wolverine.EntityFrameworkCore;
 
 
-namespace Neuraltech.SharedKernel.Infraestructure.Pgbersistence.EFCore.Contexts
+namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Contexts
 {
     public abstract class 
         BaseDbContext<TContext> : DbContext, IUnitOfWork
@@ -22,9 +19,12 @@ namespace Neuraltech.SharedKernel.Infraestructure.Pgbersistence.EFCore.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.MapWolverineEnvelopeStorage();
+
+            /*
             modelBuilder.AddInboxStateEntity();
             modelBuilder.AddOutboxMessageEntity();
-            modelBuilder.AddOutboxStateEntity();
+            modelBuilder.AddOutboxStateEntity();*/
         }
 
         public override int SaveChanges()

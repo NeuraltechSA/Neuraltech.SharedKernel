@@ -1,11 +1,17 @@
 ﻿using Confluent.Kafka;
+using HealthChecks.UI.Client;
+using JasperFx.Resources;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Neuraltech.SharedKernel.Domain.Contracts;
-using Neuraltech.SharedKernel.Infraestructure.Services.MassTransit;
+using Neuraltech.SharedKernel.Infraestructure.Services.WolverineFX;
+using Wolverine;
+using Wolverine.Kafka;
 
 
 namespace Neuraltech.SharedKernel.Infraestructure.Extensions
@@ -90,7 +96,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             return builder;
         }*/
 
-
+        /*
         public static IHostApplicationBuilder UseMassTransit<T>(
             this IHostApplicationBuilder builder,
             Action<IBusRegistrationConfigurator>? inMemoryBusConfigurator = null,
@@ -144,11 +150,52 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
                 });
             });
 
-            builder.Services.AddTransient<IEventBus, EventBus>();
+            builder.Services.AddTransient<IEventBus, MassTransitEventBus>();
             builder.Services.AddTransient<ISnapshotPublisher, SnapshotPublisher>();
 
             return builder;
         }
+        */
 
+
+        public static IHostApplicationBuilder UseWolverineFx<T>(
+            this IHostApplicationBuilder builder)
+        {
+            builder.UseWolverine(options =>
+            {
+                options.ApplicationAssembly = typeof(T).Assembly;
+
+                options.Policies.UseDurableOutboxOnAllSendingEndpoints();
+                options.Policies.UseDurableInboxOnAllListeners();
+                options.Policies.UseDurableLocalQueues();
+
+                options
+                    .UseKafka(builder.Configuration["Kafka:BootstrapServers"]!)
+                    .ConfigureClient(cfg =>
+                    {
+                        if(builder.Configuration.GetSection("Kafka:Auth").Exists())
+                        {
+                            cfg.SaslUsername = builder.Configuration["Kafka:Auth:Username"];
+                            cfg.SaslPassword = builder.Configuration["Kafka:Auth:Password"];
+                            cfg.SaslMechanism = Enum.Parse<SaslMechanism>(builder.Configuration["Kafka:Auth:SaslMechanism"]!);
+                            cfg.SecurityProtocol = Enum.Parse<SecurityProtocol>(builder.Configuration["Kafka:Auth:SecurityProtocol"]!);
+                        }
+
+                    })
+                    .ConfigureConsumers(cfg =>
+                    {
+                        cfg.GroupId = builder.Configuration.GetValue<string>("Kafka:ConsumerGroupId");
+                    })
+                    .AutoProvision();
+            });
+
+            builder.Services.AddResourceSetupOnStartup();
+
+
+            builder.Services.AddScoped<IEventBus, WolverineEventBus>();
+
+
+            return builder;
+        }
     }
 }

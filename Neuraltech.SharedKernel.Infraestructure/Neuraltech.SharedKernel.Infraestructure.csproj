@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
     <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="Grafana.OpenTelemetry" Version="1.5.2" />
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.4" />
     <PackageReference Include="MassTransit.Kafka" Version="8.5.7" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.9" />
@@ -20,17 +23,32 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NLog" Version="6.0.6" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Npgsql.OpenTelemetry" Version="10.0.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.15.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.15.0-beta.1" />
     <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
     <PackageReference Include="WolverineFx" Version="5.12.1" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.12.1" />
+    <PackageReference Include="WolverineFx.Kafka" Version="5.12.1" />
+    <PackageReference Include="WolverineFx.Postgresql" Version="5.12.1" />
     <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Gemini.Skills\backend-engineer\references\GeminiReference.Blog\GeminiReference.Blog.AspireApp.ServiceDefaults\GeminiReference.Blog.AspireApp.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Neuraltech.SharedKernel.Application\Neuraltech.SharedKernel.Application.csproj" />
     <ProjectReference Include="..\Neuraltech.SharedKernel.Domain\Neuraltech.SharedKernel.Domain.csproj" />
   </ItemGroup>

@@ -26,7 +26,7 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Update
         protected override async ValueTask<UseCaseResponse<Unit>> ExecuteLogic(TRequest request)
         {
             var entityToUpdate = await _findByIdRepository.Find(request.Id);
-            Ensure.NotNull(entityToUpdate, _ => EntityToUpdateNotFoundException.CreateFromId(request.Id));
+            Ensure.NotNull(entityToUpdate, () => EntityToUpdateNotFoundException.CreateFromId(request.Id));
 
             _logger.LogInformation($"Updating entity of type {typeof(TEntity).Name} with id {request.Id}");
             var updatedEntity = Combine(entityToUpdate!, request);
