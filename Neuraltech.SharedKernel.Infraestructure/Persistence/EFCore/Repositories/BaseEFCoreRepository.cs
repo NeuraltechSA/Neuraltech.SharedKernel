@@ -5,6 +5,8 @@ using Neuraltech.SharedKernel.Domain.Base.Criteria;
 using Neuraltech.SharedKernel.Domain.Base;
 using Microsoft.EntityFrameworkCore;
 using Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Services;
+using System.Data.Common;
+using Neuraltech.SharedKernel.Infraestructure.Exceptions;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositories
 {
@@ -78,9 +80,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// La entidad se marca como modificada con tracking habilitado para permitir el seguimiento de cambios.
         /// </summary>
         /// <param name="entity">Entidad de dominio a actualizar</param>
-        public ValueTask Update(TEntity entity){
+        public async ValueTask Update(TEntity entity){
             _dbSet.Update(_modelParser.MapToModel(entity));
-            return ValueTask.CompletedTask;
         }
 
         /// <summary>
@@ -88,9 +89,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// La entidad se marca para eliminación con tracking habilitado.
         /// </summary>
         /// <param name="entity">Entidad de dominio a eliminar</param>
-        public ValueTask Delete(TEntity entity){
+        public async ValueTask Delete(TEntity entity){
             _dbSet.Remove(_modelParser.MapToModel(entity));
-            return ValueTask.CompletedTask;
         }
 
         /// <summary>
@@ -105,7 +105,23 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
             var result = await GetBaseQuery().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return result == null ? null : _modelParser.MapToEntity(result);
         }
+        /*
+                     /*try
+            {
+                
+            }
+            catch (DbException ex)
+            {
+                List<string> sqlStates = ["23505", "1062", "2627"];
+                if (sqlStates.Contains(ex.SqlState ?? ""))
+                {
+                    throw IdAlreadyInDbException.Create(model.Id.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
 
+            }*/
         /// <summary>
         /// Busca entidades que cumplan con el criterio especificado.
         /// Utiliza AsNoTracking() para optimizar rendimiento al ser una operación de solo lectura.

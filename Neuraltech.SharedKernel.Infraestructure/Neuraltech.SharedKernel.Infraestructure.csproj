@@ -45,10 +45,10 @@
     <PackageReference Include="WolverineFx.Kafka" Version="5.12.1" />
     <PackageReference Include="WolverineFx.Postgresql" Version="5.12.1" />
     <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.5.0" />
+    <PackageReference Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Gemini.Skills\backend-engineer\references\GeminiReference.Blog\GeminiReference.Blog.AspireApp.ServiceDefaults\GeminiReference.Blog.AspireApp.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Neuraltech.SharedKernel.Application\Neuraltech.SharedKernel.Application.csproj" />
     <ProjectReference Include="..\Neuraltech.SharedKernel.Domain\Neuraltech.SharedKernel.Domain.csproj" />
   </ItemGroup>

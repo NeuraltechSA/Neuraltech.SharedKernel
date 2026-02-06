@@ -1,7 +1,10 @@
 ﻿//using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Neuraltech.SharedKernel.Domain.Contracts;
+using Neuraltech.SharedKernel.Infraestructure.Exceptions;
+using Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Models;
 using Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Services;
+using System.Data.Common;
 using Wolverine.EntityFrameworkCore;
 
 
@@ -33,11 +36,34 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Contexts
             return base.SaveChanges();
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            EntityTimestampUpdater.UpdateTimestamps(this);
-            return base.SaveChangesAsync(cancellationToken);
+            try
+            {
+                EntityTimestampUpdater.UpdateTimestamps(this);
+                return await base.SaveChangesAsync(cancellationToken);
+            }
+            catch(DbUpdateException ex) 
+            {
+                TryThrowDuplicateKeyException(ex.InnerException);
+                throw;
+            }
         }
-         
+
+        protected void TryThrowDuplicateKeyException(Exception? ex)
+        {
+            if (ex is null || ex is not DbException dbEx) return;
+
+            var entry = ChangeTracker.Entries().FirstOrDefault();
+            if (entry is null) return;
+            if (entry.Entity is not BaseEFCoreModel entity) return;
+
+            List<string> sqlStates = ["23505", "1062", "2627"];
+            if (sqlStates.Contains(dbEx.SqlState ?? ""))
+            {
+                throw IdAlreadyInDbException.Create(entity.Id.ToString());
+            }
+        }
+
     }
 }

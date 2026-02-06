@@ -42,22 +42,11 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Create
         protected override async ValueTask<UseCaseResponse<Unit>> ExecuteLogic(TRequest request)
         {
             var entity = await ProcessRequest(request);
-            try
-            {
-                await _repository.Create(entity);
-                await _eventBus.Publish(entity.PullDomainEvents());
-                await _unitOfWork.SaveChangesAsync();
+            await _repository.Create(entity);
+            await _eventBus.Publish(entity.PullDomainEvents());
+            await _unitOfWork.SaveChangesAsync();
 
-                return UseCaseResponse.Empty();
-            }
-            catch(ArgumentException e)
-            {
-                if(e.Message.StartsWith("An item with the same key has already been added."))
-                {
-                    throw IdAlreadyExistsException.CreateFromId(entity.Id.Value);
-                }
-                throw;
-            }
+            return UseCaseResponse.Empty();
         }
     }
 }

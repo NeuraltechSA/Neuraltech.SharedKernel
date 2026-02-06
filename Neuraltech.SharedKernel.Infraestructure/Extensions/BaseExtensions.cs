@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Neuraltech.SharedKernel.Domain.Services;
+using Neuraltech.SharedKernel.Infraestructure.ExceptionHandlers;
 using Neuraltech.SharedKernel.Infraestructure.Services;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Extensions
@@ -49,6 +50,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             return services;
         }
 
+
+
         public static IHostApplicationBuilder UseDefaultExtensions(
             this IHostApplicationBuilder builder
         )
@@ -68,6 +71,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             builder.Services.UseSleeper();
 
             builder.Services.UseGuidGenerator();
+
+            builder.Services.UseExceptionHandlers();
 
 
             return builder;

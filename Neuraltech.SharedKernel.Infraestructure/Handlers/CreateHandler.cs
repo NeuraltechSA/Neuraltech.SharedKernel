@@ -22,7 +22,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Handlers
 
         protected abstract TUseCaseRequest MapUseCaseRequest(TRequest request);
 
-        [MapException(typeof(IdAlreadyExistsException), StatusCodes.Status409Conflict)]
+        //[MapException(typeof(IdAlreadyExistsException), StatusCodes.Status409Conflict)]
         public virtual async ValueTask<IActionResult> Create(TRequest request)
         {
             await _useCase.Execute(MapUseCaseRequest(request));
