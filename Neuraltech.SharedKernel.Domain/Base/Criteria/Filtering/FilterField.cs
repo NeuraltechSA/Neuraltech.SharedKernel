@@ -13,4 +13,6 @@ public sealed record FilterField
     {
         return new FilterField(fieldName);
     }
+
+    public override string ToString() => Value;
 }

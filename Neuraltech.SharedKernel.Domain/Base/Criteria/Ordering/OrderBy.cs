@@ -13,4 +13,6 @@ public sealed record OrderBy
     {
         return new OrderBy(propertyName);
     }
+
+    public override string ToString() => Value;
 }

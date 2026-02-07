@@ -36,7 +36,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
                         .AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
                         .AddRuntimeInstrumentation()
-                        .AddNpgsqlInstrumentation();
+                        .AddNpgsqlInstrumentation()
+                        .AddFusionCacheInstrumentation();
                 })
                 .WithTracing(tracing =>
                 {
@@ -46,7 +47,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
                         .AddHttpClientInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation()
                         .AddRedisInstrumentation()
-                        .AddNpgsql();
+                        .AddNpgsql()
+                        .AddFusionCacheInstrumentation();
                 });
 
             // Export OpenTelemetry data via OTLP, using env vars for the configuration

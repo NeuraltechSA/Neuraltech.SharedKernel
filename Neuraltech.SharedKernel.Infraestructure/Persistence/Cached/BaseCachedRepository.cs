@@ -19,7 +19,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.CachedFCore
             BaseEFCoreRepository<TEntity, TModel, TCriteria> repository,
             IFusionCache cachingProvider
         ) : IRepository<TEntity, TCriteria>
-        where TEntity : Entity
+        where TEntity : AggregateRoot
         where TModel : BaseEFCoreModel
         where TCriteria : BaseCriteria<TCriteria>
     {

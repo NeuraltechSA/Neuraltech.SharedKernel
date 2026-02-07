@@ -17,4 +17,6 @@ public sealed record Pagination
         this.Size = Size;
         this.Page = Page;
     }
+
+    public override string ToString() => $"{Page},{Size}";
 }

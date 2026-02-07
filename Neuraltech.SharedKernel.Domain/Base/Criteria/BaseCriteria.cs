@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Neuraltech.SharedKernel.Domain.Base.Criteria.Filtering;
 using Neuraltech.SharedKernel.Domain.Base.Criteria.Ordering;
 
@@ -10,7 +13,11 @@ public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
     protected Filters Filters { get; set; }
     protected Orders Orders { get; set; }
 
-    public BaseCriteria(Pagination? pagination = null, Filters? filters = null, Orders? orders = null)
+    public BaseCriteria(
+        Pagination? pagination = null,
+        Filters? filters = null,
+        Orders? orders = null
+    )
     {
         Filters = filters ?? new Filters([]);
         Orders = orders ?? new Orders([]);
@@ -24,11 +31,9 @@ public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
 
     public T Paginate(long page, long pageSize)
     {
-
         Pagination = new Pagination(pageSize, page);
         return (T)this;
     }
-
 
     public long? GetPageSize() => Pagination?.Size;
 
@@ -51,7 +56,7 @@ public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
         Orders = new Orders(newOrders);
         return (T)this;
     }
-    
+
     public List<Filter> GetFilters() => Filters.Value;
 
     public List<Order> GetOrders() => Orders.Value;
@@ -64,5 +69,24 @@ public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
     public bool HasOrder()
     {
         return Orders.Value.Any();
+    }
+
+    public override string ToString()
+    {
+        var parts = new List<string>();
+
+        var f = Filters?.ToString() ?? "";
+        if (!string.IsNullOrEmpty(f))
+            parts.Add(f);
+
+        var o = Orders?.ToString() ?? "";
+        if (!string.IsNullOrEmpty(o))
+            parts.Add(o);
+
+        var p = Pagination?.ToString() ?? "";
+        if (!string.IsNullOrEmpty(p))
+            parts.Add(p);
+
+        return parts.Any() ? string.Join("|", parts) : "none";
     }
 }

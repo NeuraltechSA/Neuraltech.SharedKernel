@@ -18,7 +18,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
     /// <typeparam name="TModel">Modelo de persistencia de EF Core</typeparam>
     /// <typeparam name="TCriteria">Criterio de búsqueda</typeparam>
     public abstract class BaseEFCoreRepository<TEntity, TModel, TCriteria> : IRepository<TEntity, TCriteria>
-        where TEntity : Entity
+        where TEntity : AggregateRoot
         where TModel : BaseEFCoreModel
         where TCriteria : BaseCriteria<TCriteria>
     {
@@ -71,7 +71,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// La entidad se agrega al contexto con tracking habilitado para permitir el seguimiento de cambios.
         /// </summary>
         /// <param name="entity">Entidad de dominio a crear</param>
-        public async ValueTask Create(TEntity entity){
+        public virtual async ValueTask Create(TEntity entity){
             await _dbSet.AddAsync(_modelParser.MapToModel(entity));
         }
 
@@ -80,7 +80,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// La entidad se marca como modificada con tracking habilitado para permitir el seguimiento de cambios.
         /// </summary>
         /// <param name="entity">Entidad de dominio a actualizar</param>
-        public async ValueTask Update(TEntity entity){
+        public virtual async ValueTask Update(TEntity entity){
             _dbSet.Update(_modelParser.MapToModel(entity));
         }
 
@@ -89,7 +89,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// La entidad se marca para eliminación con tracking habilitado.
         /// </summary>
         /// <param name="entity">Entidad de dominio a eliminar</param>
-        public async ValueTask Delete(TEntity entity){
+        public virtual async ValueTask Delete(TEntity entity){
             _dbSet.Remove(_modelParser.MapToModel(entity));
         }
 
@@ -128,13 +128,13 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Repositorie
         /// </summary>
         /// <param name="criteria">Criterio de búsqueda</param>
         /// <returns>Colección de entidades que cumplen el criterio</returns>
-        public async ValueTask<IEnumerable<TEntity>> Find(TCriteria criteria){
+        public virtual async ValueTask<IEnumerable<TEntity>> Find(TCriteria criteria){
             // AsNoTracking() mejora rendimiento al no necesitar seguimiento de cambios para consultas de lectura
             var items = await _linqCriteriaConverter.Apply(criteria, GetBaseQuery()).AsNoTracking().ToListAsync();
             return items.Select(_modelParser.MapToEntity);
         }
 
-        public async ValueTask<long> Count(TCriteria criteria)
+        public async virtual ValueTask<long> Count(TCriteria criteria)
         {
             return await _linqCriteriaConverter.Apply(criteria, GetBaseQuery()).LongCountAsync();
         }

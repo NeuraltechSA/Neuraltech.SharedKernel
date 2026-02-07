@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace Neuraltech.SharedKernel.Domain.Base.Criteria.Filtering;
 
 public sealed class Filter
@@ -22,6 +20,10 @@ public sealed class Filter
     }
 
     public object? GetValue() => _value.Value;
+
     public string GetField() => _field.Value;
+
     public FilterOperators GetOperator() => _operator.Value;
+
+    public override string ToString() => $"{_field}_{_operator}_{_value}";
 }

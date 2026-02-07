@@ -11,7 +11,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
     /// Repositorio base en memoria usando FusionCache con Named Caches.
     /// Optimizado para datos volátiles con alto rate de lectura/escritura.
     /// Cada repositorio usa su propio named cache aislado.
-    /// Ideal para: ObjectMetadata, AnalyticEvents, Sessions, Tracking data.
+    /// Ideal para: Sessions, Tracking data.
     /// </summary>
     /// <typeparam name="TEntity">Entidad de dominio</typeparam>
     /// <typeparam name="TCriteria">Criterio de búsqueda</typeparam>

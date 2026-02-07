@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
- 
 
 namespace Neuraltech.SharedKernel.Domain.Base
 {
-
     /// <summary>
     /// Represents an optional value. Useful for unset properties.
     /// </summary>
@@ -15,7 +13,6 @@ namespace Neuraltech.SharedKernel.Domain.Base
     /// <param name="HasValue"></param>
     public readonly record struct Optional<T>(T Value, bool HasValue)
     {
-
         /// <summary>
         /// Creates an optional value with a value.
         /// </summary>
@@ -36,12 +33,13 @@ namespace Neuraltech.SharedKernel.Domain.Base
         /// <returns></returns>
         public static implicit operator Optional<T>(T value) => Some(value);
 
-
         /// <summary>
         /// Retrieves the current value if it is set; otherwise, returns the specified default value.
         /// </summary>
         /// <param name="defaultValue">The value to return if the current value is not set.</param>
         /// <returns>The current value if it is set; otherwise, <paramref name="defaultValue"/>.</returns>
         public T GetValueOrDefault(T defaultValue) => HasValue ? Value : defaultValue;
+
+        public override string ToString() => HasValue ? Value?.ToString() ?? "" : "";
     }
 }

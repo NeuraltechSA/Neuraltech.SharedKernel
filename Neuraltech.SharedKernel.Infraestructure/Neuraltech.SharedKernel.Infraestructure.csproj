@@ -53,8 +53,4 @@
     <ProjectReference Include="..\Neuraltech.SharedKernel.Domain\Neuraltech.SharedKernel.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Filters\" />
-  </ItemGroup>
-
 </Project>

@@ -18,5 +18,8 @@ public sealed record Order
     }
 
     public string GetOrderBy() => _orderBy.Value;
+
     public OrderTypes GetOrderType() => _orderType.Value;
+
+    public override string ToString() => $"{_orderBy}_{_orderType}";
 }
