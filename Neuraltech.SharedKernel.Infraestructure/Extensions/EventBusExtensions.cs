@@ -11,7 +11,9 @@ using Microsoft.Extensions.Hosting;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Neuraltech.SharedKernel.Infraestructure.Services.WolverineFX;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 using Wolverine.Kafka;
+using Wolverine.Postgresql;
 
 
 namespace Neuraltech.SharedKernel.Infraestructure.Extensions
@@ -159,12 +161,19 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 
 
         public static IHostApplicationBuilder UseWolverineFx<T>(
-            this IHostApplicationBuilder builder)
+            this IHostApplicationBuilder builder,
+            string connection)
+            where T :DbContext
         {
+
+
             builder.UseWolverine(options =>
             {
+
+
                 options.ApplicationAssembly = typeof(T).Assembly;
 
+                //options.PersistMessagesWithPostgresql()
                 options.Policies.UseDurableOutboxOnAllSendingEndpoints();
                 options.Policies.UseDurableInboxOnAllListeners();
                 options.Policies.UseDurableLocalQueues();
@@ -193,6 +202,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 
 
             builder.Services.AddScoped<IEventBus, WolverineEventBus>();
+            builder.Services.AddScoped<ISnapshotPublisher, WolverineSnapshotPublisher>();
 
 
             return builder;

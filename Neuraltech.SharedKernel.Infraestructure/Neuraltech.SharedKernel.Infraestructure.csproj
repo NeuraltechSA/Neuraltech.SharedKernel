@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
     <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
@@ -19,7 +20,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="9.6.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.2" />
@@ -39,13 +42,16 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.15.0-beta.1" />
     <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
+    <PackageReference Include="StackExchange.Redis" Version="2.10.14" />
     <PackageReference Include="WolverineFx" Version="5.12.1" />
     <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.12.1" />
     <PackageReference Include="WolverineFx.Kafka" Version="5.12.1" />
     <PackageReference Include="WolverineFx.Postgresql" Version="5.12.1" />
     <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.5.0" />
+    <PackageReference Include="ZiggyCreatures.FusionCache.Backplane.StackExchangeRedis" Version="2.5.0" />
+    <PackageReference Include="ZiggyCreatures.FusionCache.Locking.Distributed.Redis" Version="2.5.0" />
     <PackageReference Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="2.5.0" />
+    <PackageReference Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>

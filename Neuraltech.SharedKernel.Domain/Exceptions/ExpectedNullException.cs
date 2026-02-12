@@ -1,5 +1,3 @@
-using Neuraltech.SharedKernel.Domain.Exceptions;
-
 namespace Neuraltech.SharedKernel.Domain.Exceptions
 {
     public class ExpectedNullException : DomainException

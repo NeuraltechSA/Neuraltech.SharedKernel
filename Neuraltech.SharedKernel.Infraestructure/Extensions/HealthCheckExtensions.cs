@@ -6,9 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 {
@@ -48,6 +45,19 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 
             return builder.Services.AddHealthChecks();
         }
+
+        
+        public static IHealthChecksBuilder AddRedis(
+          this IHealthChecksBuilder builder,
+          IConfiguration configuration
+        )
+        {
+            var redisConnStr = configuration.GetConnectionString("Redis");
+            builder.AddRedis(redisConnStr!);
+
+            return builder;
+        }
+
         public static IHealthChecksBuilder AddKafka(
           this IHealthChecksBuilder builder,
           IConfiguration configuration

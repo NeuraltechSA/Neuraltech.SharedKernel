@@ -5,6 +5,6 @@ namespace Neuraltech.SharedKernel.Domain.Contracts
     public interface ISnapshotPublisher
     {
         ValueTask Publish<TSnapshot>(Guid id, TSnapshot? snapshot)
-            where TSnapshot : class, IEntitySnapshot;
+            where TSnapshot : class;
     }
 }

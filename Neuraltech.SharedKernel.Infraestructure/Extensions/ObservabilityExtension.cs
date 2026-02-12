@@ -19,7 +19,6 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             string serviceName
         )
         {
-
             builder.Logging.AddOpenTelemetry(options =>
             {
                 options.IncludeScopes = true;

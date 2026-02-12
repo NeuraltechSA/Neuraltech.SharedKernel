@@ -14,9 +14,6 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             where T : DbContext, IUnitOfWork
         {
             services.AddDbContext<T>(options =>
-                /*options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("postgres")
-                )*/
                 options.UseInMemoryDatabase("db")
             );
             services.AddScoped<IUnitOfWork>(c => c.GetRequiredService<T>());
@@ -27,7 +24,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
         public static IHostApplicationBuilder
         UsePostgresDb<T>(
             this IHostApplicationBuilder builder, 
-            string connectionStringName = "postgres",
+            string connectionStringName,
             Action<NpgsqlDbContextOptionsBuilder>? pgOptions = null
 
         )

@@ -2,16 +2,18 @@
 using Neuraltech.SharedKernel.Application.UseCases.Base;
 using Neuraltech.SharedKernel.Domain.Base;
 using Neuraltech.SharedKernel.Domain.Contracts;
-using Neuraltech.SharedKernel.Domain.Services;
 
 namespace Neuraltech.SharedKernel.Application.UseCases.PublishSnapshot
 {
-    public class PublishSnapshotUseCase<TEntity, TSnapshot> : BaseUseCase<Guid>
-        where TSnapshot : class, IEntitySnapshot
-        where TEntity : AggregateRoot,IProjectable<TSnapshot>
+    public abstract class PublishSnapshotUseCase<TEntity, TSnapshot, TIntegrationSnapshot> : BaseUseCase<Guid>
+        where TSnapshot : class
+        where TIntegrationSnapshot : class
+        where TEntity : AggregateRoot, ISnapshotable<TEntity, TSnapshot>
     {
         private readonly ISnapshotPublisher _snapshotPublisher;
         private readonly IFindByIdRepository<TEntity> _repository;
+
+        protected abstract TIntegrationSnapshot MapSnapshot(TSnapshot snapshot);
 
         public PublishSnapshotUseCase(
             IFindByIdRepository<TEntity> repository,
@@ -25,9 +27,12 @@ namespace Neuraltech.SharedKernel.Application.UseCases.PublishSnapshot
         protected override async ValueTask<UseCaseResponse<Unit>> ExecuteLogic(Guid id)
         {
             var entity = await _repository.Find(id);
-            //Ensure.NotNull(entity);
+            var snapshot = entity?.ToSnapshot();
+            var integrationSnapshot = snapshot is not null ? 
+                MapSnapshot(snapshot!) : null;
 
-            await _snapshotPublisher.Publish(id, entity?.ToSnapshot());
+
+            await _snapshotPublisher.Publish(id,integrationSnapshot);
 
             return UseCaseResponse.Empty();
         }

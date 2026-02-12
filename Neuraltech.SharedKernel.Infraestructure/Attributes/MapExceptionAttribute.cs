@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Attributes
 {
+    [Obsolete("Consider using BaseExceptionHandler")]
     public class MapExceptionAttribute : ExceptionFilterAttribute
     {
         public Type ExceptionType { get; }

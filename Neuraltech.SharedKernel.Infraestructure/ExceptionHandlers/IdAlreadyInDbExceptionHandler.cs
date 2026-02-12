@@ -2,37 +2,41 @@
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Neuraltech.SharedKernel.Infraestructure.Exceptions;
-using Neuraltech.SharedKernel.Infraestructure.Localization;
 
 namespace Neuraltech.SharedKernel.Infraestructure.ExceptionHandlers
 {
     public sealed class IdAlreadyInDbExceptionHandler : BaseExceptionHandler<IdAlreadyInDbException>
     {
-      
-        private readonly IStringLocalizer<SharedLocalization> _localizer;
         public IdAlreadyInDbExceptionHandler(
-            IProblemDetailsService problemDetailsService, 
+            IProblemDetailsService problemDetailsService,
             ILogger<GlobalExceptionHandler> logger,
-            IStringLocalizer<SharedLocalization> localizer
-        ) : base(problemDetailsService, logger)
-        {
-            _localizer = localizer;
-        }
+            IStringLocalizerFactory localizerFactory
+        )
+            : base(problemDetailsService, logger, localizerFactory) { }
 
         protected override IdAlreadyInDbException? ParseException(Exception exception)
         {
-            if (exception is not IdAlreadyInDbException dbException) return null;
+            if (exception is not IdAlreadyInDbException dbException)
+                return null;
             return dbException;
         }
 
-        protected override string ProblemDetail(IdAlreadyInDbException exception, HttpContext context)
+        protected override string ProblemDetail(
+            IdAlreadyInDbException exception,
+            HttpContext context,
+            IStringLocalizer localizer
+        )
         {
-            return _localizer.GetString("Error_IdAlreadyInDb_Detail", exception.DuplicatedId);
+            return localizer.GetString("Error_IdAlreadyInDb_Detail", exception.DuplicatedId);
         }
 
-        protected override string ProblemTitle(IdAlreadyInDbException exeception, HttpContext context)
+        protected override string ProblemTitle(
+            IdAlreadyInDbException exception,
+            HttpContext context,
+            IStringLocalizer localizer
+        )
         {
-            return _localizer["Error_IdAlreadyInDb_Title"];
+            return localizer["Error_IdAlreadyInDb_Title"];
         }
 
         protected override int StatusCode(IdAlreadyInDbException exception)

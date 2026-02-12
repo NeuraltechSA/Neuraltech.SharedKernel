@@ -56,9 +56,6 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             this IHostApplicationBuilder builder
         )
         {
-            builder.Services.AddRequestTimeouts();
-            builder.Services.AddOutputCache();
-
             var serviceName = builder.Configuration.GetValue<string>("ServiceName");
             Ensure.NotNull(serviceName);
 
