@@ -162,7 +162,9 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 
         public static IHostApplicationBuilder UseWolverineFx<T>(
             this IHostApplicationBuilder builder,
-            string connection)
+            string dbConnectionString,
+            string wolverineDbSchema = "public"
+        )
             where T :DbContext
         {
 
@@ -173,10 +175,19 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 
                 options.ApplicationAssembly = typeof(T).Assembly;
 
-                //options.PersistMessagesWithPostgresql()
+                options.PersistMessagesWithPostgresql(
+                    builder.Configuration.GetConnectionString(dbConnectionString)!,
+                    wolverineDbSchema
+                );
+
+
+                options.UseEntityFrameworkCoreTransactions();
+
                 options.Policies.UseDurableOutboxOnAllSendingEndpoints();
                 options.Policies.UseDurableInboxOnAllListeners();
                 options.Policies.UseDurableLocalQueues();
+
+
 
                 options
                     .UseKafka(builder.Configuration["Kafka:BootstrapServers"]!)
@@ -201,8 +212,12 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             builder.Services.AddResourceSetupOnStartup();
 
 
+
             builder.Services.AddScoped<IEventBus, WolverineEventBus>();
             builder.Services.AddScoped<ISnapshotPublisher, WolverineSnapshotPublisher>();
+
+            builder.Services.AddScoped<WolverineDbContextOutbox<T>>();
+            builder.Services.AddScoped<IUnitOfWork>(c => c.GetRequiredService<WolverineDbContextOutbox<T>>());
 
 
             return builder;

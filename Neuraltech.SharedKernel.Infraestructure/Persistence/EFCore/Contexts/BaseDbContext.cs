@@ -11,7 +11,7 @@ using Wolverine.EntityFrameworkCore;
 namespace Neuraltech.SharedKernel.Infraestructure.Persistence.EFCore.Contexts
 {
     public abstract class 
-        BaseDbContext<TContext> : DbContext, IUnitOfWork
+        BaseDbContext<TContext> : DbContext //, IUnitOfWork
         where TContext : DbContext
     {
         public BaseDbContext(DbContextOptions<TContext> options) : base(options)

@@ -10,12 +10,10 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Create
     public abstract class CreateUseCase<TEntity>(
         ILogger logger,
         ICreateRepository<TEntity> repository,
-        IEventBus eventBus,
         IUnitOfWork unitOfWork
     ) : CreateUseCase<TEntity, TEntity>(
         logger,
         repository,
-        eventBus,
         unitOfWork
     ) where TEntity : AggregateRoot
     {
@@ -28,13 +26,11 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Create
     public abstract class CreateUseCase<TRequest, TEntity>(
         ILogger logger,
         ICreateRepository<TEntity> repository,
-        IEventBus eventBus,
         IUnitOfWork unitOfWork
     ) : BaseUseCase<TRequest>(logger)
         where TEntity : AggregateRoot
     {
         private readonly ICreateRepository<TEntity> _repository = repository;
-        protected readonly IEventBus _eventBus = eventBus;
         protected readonly IUnitOfWork _unitOfWork = unitOfWork;
         
         protected abstract ValueTask<TEntity> ProcessRequest(TRequest request);
@@ -43,8 +39,9 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Create
         {
             var entity = await ProcessRequest(request);
             await _repository.Create(entity);
-            await _eventBus.Publish(entity.PullDomainEvents());
-            await _unitOfWork.SaveChangesAsync();
+
+            await _unitOfWork.PublishEvents(entity.PullDomainEvents());
+            await _unitOfWork.SaveChangesAndFlushEvents();
 
             return UseCaseResponse.Empty();
         }

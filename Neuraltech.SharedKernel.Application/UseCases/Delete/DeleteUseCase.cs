@@ -19,13 +19,11 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Delete
         ILogger logger,
         IFindByIdRepository<TEntity> findByIdRepository,
         IDeleteRepository<TEntity> repository,
-        IEventBus eventBus,
         IUnitOfWork unitOfWork
     ) : BaseUseCase<Guid>(logger)
         where TEntity : AggregateRoot
     {
         private readonly IDeleteRepository<TEntity> _repository = repository;
-        private readonly IEventBus _eventBus = eventBus;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IFindByIdRepository<TEntity> _findByIdRepository = findByIdRepository;
 
@@ -50,8 +48,8 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Delete
             if (entity is IDeletable deletableEntity) deletableEntity.Delete();
 
             await _repository.Delete(entity!);
-            await _eventBus.Publish(entity!.PullDomainEvents());
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.PublishEvents(entity!.PullDomainEvents());
+            await _unitOfWork.SaveChangesAndFlushEvents();
 
             _logger.LogInformation($"Entity of type {typeof(TEntity).Name} with id {id} deleted successfully");
 

@@ -1,12 +1,14 @@
 ﻿using Neuraltech.SharedKernel.Domain.Base;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Services.WolverineFX
 {
     public class WolverineEventBus : IEventBus
     {
         private readonly IMessageBus _bus;
+
         public WolverineEventBus(IMessageBus bus)
         {
             _bus = bus;

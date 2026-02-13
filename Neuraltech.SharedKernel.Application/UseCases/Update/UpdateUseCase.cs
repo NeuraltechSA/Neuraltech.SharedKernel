@@ -11,14 +11,12 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Update
         ILogger logger,
         IFindByIdRepository<TEntity> findByIdRepository,
         IUpdateRepository<TEntity> repository,
-        IEventBus eventBus,
         IUnitOfWork unitOfWork
     ) : BaseUseCase<TRequest>(logger)
         where TRequest : UpdateDTO
         where TEntity : AggregateRoot
     {
         private readonly IUpdateRepository<TEntity> _repository = repository;
-        private readonly IEventBus _eventBus = eventBus;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IFindByIdRepository<TEntity> _findByIdRepository = findByIdRepository;
 
@@ -37,8 +35,10 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Update
             );
             var updatedEntity = Combine(entityToUpdate!, request);
             await _repository.Update(updatedEntity);
-            await _eventBus.Publish(updatedEntity.PullDomainEvents());
-            await _unitOfWork.SaveChangesAsync();
+
+            await _unitOfWork.PublishEvents(updatedEntity.PullDomainEvents());
+            await _unitOfWork.SaveChangesAndFlushEvents();
+
             _logger.LogInformation(
                 $"Entity of type {typeof(TEntity).Name} with id {request.Id} updated successfully"
             );

@@ -15,7 +15,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
     /// </summary>
     /// <typeparam name="TEntity">Entidad de dominio</typeparam>
     /// <typeparam name="TCriteria">Criterio de búsqueda</typeparam>
-    public abstract class IndexedInMemoryRepository<TEntity, TCriteria> : IRepository<TEntity, TCriteria>
+    public abstract class IndexedInMemoryRepository<TEntity, TCriteria>
+        : IRepository<TEntity, TCriteria>
         where TEntity : Entity
         where TCriteria : BaseCriteria<TCriteria>
     {
@@ -27,20 +28,23 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
         protected virtual FusionCacheEntryOptions DefaultCacheOptions =>
             new FusionCacheEntryOptions
             {
-                Duration = TimeSpan.FromMinutes(5),      // TTL corto por defecto
+                Duration = TimeSpan.FromMinutes(5), // TTL corto por defecto
                 Size = 1,
                 IsFailSafeEnabled = true,
                 FailSafeMaxDuration = TimeSpan.FromMinutes(30),
-                FailSafeThrottleDuration = TimeSpan.FromSeconds(10)
+                FailSafeThrottleDuration = TimeSpan.FromSeconds(10),
             };
+
         protected IndexedInMemoryRepository(IFusionCacheProvider cacheProvider)
         {
             _cacheProvider = cacheProvider;
             _criteriaConverter = new LinqCriteriaConverter();
         }
+
         protected abstract Guid GetEntityId(TEntity entity);
         protected abstract string EntityCachePrefix { get; }
         protected virtual string IndexesCacheKey => $"keys/{EntityCachePrefix}";
+
         protected virtual string GetEntityCacheKey(Guid id) => $"{EntityCachePrefix}/{id}";
 
         public virtual async ValueTask Create(TEntity entity)
@@ -52,13 +56,15 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
             if (existing.HasValue)
             {
                 throw new InvalidOperationException(
-                    $"Entity with ID '{id}' already exists in cache. Use Update instead.");
+                    $"Entity with ID '{id}' already exists in cache. Use Update instead."
+                );
             }
 
             // Guardar entidad
             await Cache.SetAsync(cacheKey, entity, DefaultCacheOptions);
             await AddToIndexes(id);
         }
+
         public virtual async ValueTask Update(TEntity entity)
         {
             var id = GetEntityId(entity);
@@ -66,6 +72,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
 
             await Cache.SetAsync(cacheKey, entity, DefaultCacheOptions);
         }
+
         public virtual async ValueTask Delete(TEntity entity)
         {
             var id = GetEntityId(entity);
@@ -125,7 +132,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
             foreach (var id in indexes)
             {
                 var entity = await Find(id);
-                if (entity == null) continue;
+                if (entity == null)
+                    continue;
 
                 entities.Add(entity);
             }
@@ -135,24 +143,44 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
 
         protected virtual async ValueTask<HashSet<Guid>> GetIndexes()
         {
-            var indexes = await Cache.TryGetAsync<HashSet<Guid>>(IndexesCacheKey, DefaultCacheOptions);
+            var indexes = await Cache.TryGetAsync<HashSet<Guid>>(
+                IndexesCacheKey,
+                DefaultCacheOptions
+            );
             return indexes.GetValueOrDefault([]);
-
         }
+
         protected virtual async ValueTask AddToIndexes(Guid id)
         {
-            var indexes =  await GetIndexes();
+            var indexes = await GetIndexes();
             indexes.Add(id);
             await SaveIndexes(indexes);
         }
+
         protected virtual async ValueTask RemoveFromIndexes(Guid id)
         {
             var indexes = await GetIndexes();
             indexes.Remove(id);
             await SaveIndexes(indexes);
         }
-        public  virtual async ValueTask SaveIndexes(HashSet<Guid> keys) { 
+
+        public virtual async ValueTask SaveIndexes(HashSet<Guid> keys)
+        {
             await Cache.SetAsync(IndexesCacheKey, keys, DefaultCacheOptions);
+        }
+
+        public virtual async ValueTask Save(TEntity entity)
+        {
+            var id = GetEntityId(entity);
+            var cacheKey = GetEntityCacheKey(id);
+
+            var existing = await Cache.TryGetAsync<TEntity>(cacheKey);
+            if (!existing.HasValue)
+            {
+                await AddToIndexes(id);
+            }
+
+            await Cache.SetAsync(cacheKey, entity, DefaultCacheOptions);
         }
     }
 }

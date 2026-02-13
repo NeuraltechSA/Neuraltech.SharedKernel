@@ -15,20 +15,20 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
     /// <summary>
     /// Repositorio base en memoria usando FusionCache que almacena todas las entidades en una sola clave como lista.
     /// Optimizado para casos donde necesitas filtrar en memoria frecuentemente.
-    /// 
+    ///
     /// Diferencias con IndexedInMemoryRepository:
     /// - IndexedInMemoryRepository: Usa índice + claves individuales. Mejor para Find(id) frecuente.
     /// - InMemoryRepository: Usa lista única. Mejor para Find(criteria) frecuente y menos Find(id).
-    /// 
+    ///
     /// Ventajas:
     /// - Una sola operación de cache para obtener todos los elementos (más rápido para filtros)
     /// - No necesita mantener índice sincronizado
     /// - Menos claves en cache
-    /// 
+    ///
     /// Desventajas:
     /// - Find(id) requiere deserializar toda la lista
     /// - Update/Delete requieren reescribir toda la lista
-    /// 
+    ///
     /// Ideal para: Pequeños conjuntos de datos (<1000 registros) con muchos filtros en memoria.
     /// </summary>
     /// <typeparam name="TEntity">Entidad de dominio</typeparam>
@@ -59,7 +59,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
                 Size = 1,
                 IsFailSafeEnabled = true,
                 FailSafeMaxDuration = TimeSpan.FromMinutes(30),
-                FailSafeThrottleDuration = TimeSpan.FromSeconds(10)
+                FailSafeThrottleDuration = TimeSpan.FromSeconds(10),
             };
 
         protected InMemoryRepository(IFusionCacheProvider cacheProvider)
@@ -103,7 +103,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
             if (entities.Any(e => GetEntityId(e) == id))
             {
                 throw new InvalidOperationException(
-                    $"Entity with ID '{id}' already exists in cache '{CacheName}'. Use Update instead.");
+                    $"Entity with ID '{id}' already exists in cache '{CacheName}'. Use Update instead."
+                );
             }
 
             // Agregar y guardar
@@ -124,7 +125,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
             if (index == -1)
             {
                 throw new InvalidOperationException(
-                    $"Entity with ID '{id}' not found in cache '{CacheName}'. Use Create instead.");
+                    $"Entity with ID '{id}' not found in cache '{CacheName}'. Use Create instead."
+                );
             }
 
             entities[index] = entity;
@@ -144,7 +146,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
             if (removed == 0)
             {
                 throw new InvalidOperationException(
-                    $"Entity with ID '{id}' not found in cache '{CacheName}'.");
+                    $"Entity with ID '{id}' not found in cache '{CacheName}'."
+                );
             }
 
             await SaveAll(entities);
@@ -193,6 +196,27 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.InMemory
         public virtual async ValueTask ClearAll()
         {
             await Cache.RemoveAsync(CollectionCacheKey);
+        }
+
+        /// <summary>
+        /// Guarda una entidad (Upsert). Si existe actualiza, si no crea.
+        /// </summary>
+        public virtual async ValueTask Save(TEntity entity)
+        {
+            var id = GetEntityId(entity);
+            var entities = await GetAll();
+            var index = entities.FindIndex(e => GetEntityId(e) == id);
+
+            if (index != -1)
+            {
+                entities[index] = entity;
+            }
+            else
+            {
+                entities.Add(entity);
+            }
+
+            await SaveAll(entities);
         }
     }
 }

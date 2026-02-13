@@ -8,7 +8,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.Cached
 {
     public abstract class BaseCachedRepository<TEntity, TCriteria, TSnapshot>
         : IRepository<TEntity, TCriteria>
-        where TEntity : AggregateRoot, ISnapshotable<TEntity, TSnapshot>
+        where TEntity : AggregateRoot, IPrimitiveSerializable<TEntity, TSnapshot>
         where TCriteria : BaseCriteria<TCriteria>
         where TSnapshot : class
     {
@@ -35,7 +35,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.Cached
             return async (ctx, ct) =>
             {
                 var entity = await _repository.Find(id);
-                return entity?.ToSnapshot();
+                return entity?.ToPrimitives();
             };
         }
 
@@ -70,7 +70,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.Cached
             return async (ctx, ct) =>
             {
                 var items = await _repository.Find(criteria);
-                return items.Select(i => i.ToSnapshot());
+                return items.Select(i => i.ToPrimitives());
             };
         }
 
@@ -124,18 +124,18 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.Cached
                 GetFindCriteriaCacheOptionsFactory(),
                 tags: CollectionTags
             );
-            return items.Select(i => TEntity.FromSnapshot(i));
+            return items.Select(i => TEntity.FromPrimitives(i));
         }
 
         public async ValueTask<TEntity?> Find(Guid id)
         {
-            var snapshot = await _cache.GetOrSetAsync(
+            var primitives = await _cache.GetOrSetAsync(
                 id.ToString(),
                 GetFindByIdCacheFactory(id),
                 GetFindByIdCacheOptionsFactory()
             );
 
-            return snapshot is not null ? TEntity.FromSnapshot(snapshot) : null;
+            return primitives is not null ? TEntity.FromPrimitives(primitives) : null;
         }
 
         public async ValueTask Update(TEntity entity)
@@ -143,6 +143,13 @@ namespace Neuraltech.SharedKernel.Infraestructure.Persistence.Cached
             await InvalidateEntityCache(entity);
             await InvalidateCollectionCache();
             await _repository.Update(entity);
+        }
+
+        public async ValueTask Save(TEntity entity)
+        {
+            await InvalidateEntityCache(entity);
+            await InvalidateCollectionCache();
+            await _repository.Save(entity);
         }
     }
 }

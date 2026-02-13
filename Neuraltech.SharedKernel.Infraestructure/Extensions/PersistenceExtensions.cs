@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Neuraltech.SharedKernel.Domain.Contracts;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
+using Wolverine.EntityFrameworkCore;
 
 namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 {
@@ -28,7 +29,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             Action<NpgsqlDbContextOptionsBuilder>? pgOptions = null
 
         )
-            where T : DbContext, IUnitOfWork
+            where T : DbContext //, IUnitOfWork
         {
             builder.Services.AddDbContext<T>(options =>
                 options.UseNpgsql(
@@ -36,9 +37,37 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
                     pgOptions
                 )
             );
-            builder.Services.AddScoped<IUnitOfWork>(c => c.GetRequiredService<T>());
+
+            ///<see cref="Infraestructure.Extensions.EventBusExtensions"/> 
+            //builder.Services.AddScoped<IUnitOfWork>(c => c.GetRequiredService<T>());
 
             return builder;
         }
+
+        /*
+        public static IHostApplicationBuilder
+        UsePostgresDbWithWolverine<T>(
+            this IHostApplicationBuilder builder,
+            string connectionStringName,
+            Action<NpgsqlDbContextOptionsBuilder>? pgOptions = null
+
+        )
+            where T : DbContext, IUnitOfWork
+        {
+            builder.Services.AddDbContextWithWolverineIntegration<T>(options =>
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString(connectionStringName),
+                    pgOptions
+                )
+            );
+
+            ///<see cref="Infraestructure.Extensions.EventBusExtensions"/> 
+            //builder.Services.AddScoped<IUnitOfWork>(c => c.GetRequiredService<T>());
+
+
+            return builder;
+        }*/
+
+
     }
 }
