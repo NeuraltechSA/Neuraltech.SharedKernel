@@ -3,7 +3,6 @@ using Neuraltech.SharedKernel.Application.UseCases.Base;
 using Neuraltech.SharedKernel.Domain.Base;
 using Neuraltech.SharedKernel.Domain.Base.Criteria;
 using Neuraltech.SharedKernel.Domain.Contracts;
-using Neuraltech.SharedKernel.Domain.Services;
 
 
 namespace Neuraltech.SharedKernel.Application.UseCases.Paginate
@@ -40,9 +39,6 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Paginate
         {
             var criteria = MapCriteria(request);
 
-            SetDefaultPagination(criteria);
-            EnsureMaxPageSize(criteria);
-
             var items = await _repository.Find(criteria);
             var count = await _repository.Count(criteria);
 
@@ -55,23 +51,6 @@ namespace Neuraltech.SharedKernel.Application.UseCases.Paginate
                 Page = (long)criteria.GetPageNumber()!,
                 PageSize = (long)criteria.GetPageSize()!
             });
-        }
-
-        private TCriteria SetDefaultPagination(TCriteria criteria)
-        {
-            if (!criteria.HasPagination())
-            {
-                criteria.Paginate(DefaultPage, DefaultPageSize);
-            }
-            return criteria;
-        }
-
-        private void EnsureMaxPageSize(TCriteria criteria)
-        {
-            if (criteria.HasPagination())
-            {
-                Ensure.InRange((long)criteria.GetPageSize()!, 0, MaxPageSize);
-            }
         }
     }
 }

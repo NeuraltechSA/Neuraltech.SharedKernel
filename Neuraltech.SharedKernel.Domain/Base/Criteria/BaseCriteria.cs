@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Neuraltech.SharedKernel.Domain.Base.Criteria.Filtering;
 using Neuraltech.SharedKernel.Domain.Base.Criteria.Ordering;
 
 namespace Neuraltech.SharedKernel.Domain.Base.Criteria;
 
-public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
+public abstract class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
     where T : BaseCriteria<T>
 {
     protected Pagination? Pagination { get; set; }
@@ -29,9 +26,11 @@ public class BaseCriteria<T> : IPaginable<T>, IOrderable<T>
         return Activator.CreateInstance<T>();
     }
 
-    public T Paginate(long page, long pageSize)
+    protected abstract Pagination PaginationFactory(Optional<long> page, Optional<long> size);
+
+    public T Paginate(Optional<long> page, Optional<long> size)
     {
-        Pagination = new Pagination(pageSize, page);
+        Pagination = PaginationFactory(page, size);
         return (T)this;
     }
 

@@ -61,6 +61,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.ExceptionHandlers
             return _localizerFactory.Create(controllerType);
         }
 
+        protected virtual Dictionary<string, object?> GetExtensions(TException exception, HttpContext context) => [];
+
         public async ValueTask<bool> TryHandleAsync(
             HttpContext httpContext,
             Exception exception,
@@ -79,6 +81,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.ExceptionHandlers
 
             httpContext.Response.StatusCode = StatusCode(parsedException);
 
+
             return await _problemDetailsService.TryWriteAsync(
                 new ProblemDetailsContext
                 {
@@ -89,6 +92,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.ExceptionHandlers
                         //Type = parsedException.GetType().Name,
                         Title = title,
                         Detail = detail,
+                        Extensions = GetExtensions(parsedException, httpContext)
+
                     },
                 }
             );

@@ -123,4 +123,22 @@
   <data name="Error_UnhandledException_Title" xml:space="preserve">
     <value>Error desconocido</value>
   </data>
+  <data name="Validation_QueryPage_ZeroOrLess" xml:space="preserve">
+    <value>La página debe ser mayor a 0</value>
+  </data>
+  <data name="Validation_QueryPage_ExceedsMax" xml:space="preserve">
+    <value>La página no puede ser mayor a {0}</value>
+  </data>
+  <data name="Validation_QueryLimit_ZeroOrLess" xml:space="preserve">
+    <value>El límite debe ser mayor a 0</value>
+  </data>
+  <data name="Validation_QueryLimit_ExceedsMax" xml:space="preserve">
+    <value>El límite no puede ser mayor a {0}</value>
+  </data>
+  <data name="Error_Validation_Detail" xml:space="preserve">
+    <value>Se encontraron uno o más errores de validación</value>
+  </data>
+  <data name="Error_Validation_Title" xml:space="preserve">
+    <value>Error de validación</value>
+  </data>
 </root>

@@ -35,6 +35,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.DTO
             }
         }
 
+        public T GetValueOrDefault(T defaultValue) => HasValue ? Value : defaultValue;
+
         public static implicit operator Optional<T>(OptionalParam<T> param) => 
             param.HasValue ? Optional<T>.Some(param.Value) : Optional<T>.None();
     }

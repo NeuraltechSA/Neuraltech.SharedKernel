@@ -20,6 +20,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
                 };
             });
 
+            services.AddExceptionHandler<ValidationExceptionHandler>();
             services.AddExceptionHandler<IdAlreadyInDbExceptionHandler>();
             services.AddExceptionHandler<EntityToUpdateNotFoundExceptionHandler>();
             services.AddExceptionHandler<EntityToDeleteNotFoundExceptionHandler>();

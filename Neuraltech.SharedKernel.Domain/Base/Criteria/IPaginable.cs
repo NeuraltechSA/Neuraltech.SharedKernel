@@ -2,7 +2,7 @@
 {
     public interface IPaginable<T> where T : IPaginable<T>
     {
-        T Paginate(long page, long pageSize);
+        T Paginate(Optional<long> page, Optional<long> size);
 
         bool HasPagination();
 
