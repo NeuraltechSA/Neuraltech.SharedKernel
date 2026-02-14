@@ -9,7 +9,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-
 namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 {
     public static class ObservabilityExtension
@@ -19,6 +18,9 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             string serviceName
         )
         {
+            builder.Logging.ClearProviders();
+
+            builder.Logging.AddConsole();
             builder.Logging.AddOpenTelemetry(options =>
             {
                 options.IncludeScopes = true;
@@ -26,9 +28,8 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             });
 
             var otel = builder.Services.AddOpenTelemetry();
-             
-            otel
-                .ConfigureResource(resource => resource.AddService(serviceName))
+
+            otel.ConfigureResource(resource => resource.AddService(serviceName))
                 .WithMetrics(metrics =>
                 {
                     metrics
@@ -49,8 +50,7 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
                         .AddRedisInstrumentation()
                         .AddNpgsql()
                         .AddFusionCacheInstrumentation()
-                        .AddSource("Wolverine")
-                        ;
+                        .AddSource("Wolverine");
                 });
 
             // Export OpenTelemetry data via OTLP, using env vars for the configuration

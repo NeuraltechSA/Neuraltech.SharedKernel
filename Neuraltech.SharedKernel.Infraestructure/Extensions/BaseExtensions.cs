@@ -14,43 +14,23 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
 {
     public static class BaseExtensions
     {
-
-
-        /*
-        public static IHostApplicationBuilder UseLogging(this IHostApplicationBuilder builder)
-        {
-            builder.Logging.ClearProviders();
-
-            builder.Logging.AddConsole();
-
-            return builder;
-        }*/
-
-        public static IServiceCollection UseTimeProvider(
-           this IServiceCollection services
-        )
+        public static IServiceCollection UseTimeProvider(this IServiceCollection services)
         {
             services.AddSingleton(TimeProvider.System);
             return services;
         }
 
-        public static IServiceCollection UseSleeper(
-            this IServiceCollection services
-        )
+        public static IServiceCollection UseSleeper(this IServiceCollection services)
         {
             services.AddScoped<ISleeper, Sleeper>();
             return services;
         }
 
-        public static IServiceCollection UseGuidGenerator(
-            this IServiceCollection services
-        )
+        public static IServiceCollection UseGuidGenerator(this IServiceCollection services)
         {
             services.AddScoped<IGuidGenerator, GuidGenerator>();
             return services;
         }
-
-
 
         public static IHostApplicationBuilder UseDefaultExtensions(
             this IHostApplicationBuilder builder
@@ -70,7 +50,6 @@ namespace Neuraltech.SharedKernel.Infraestructure.Extensions
             builder.Services.UseGuidGenerator();
 
             builder.Services.UseExceptionHandlers();
-
 
             return builder;
         }
