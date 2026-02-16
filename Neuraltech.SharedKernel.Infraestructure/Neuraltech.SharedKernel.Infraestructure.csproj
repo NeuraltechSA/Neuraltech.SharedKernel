@@ -44,6 +44,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.15.0-beta.1" />
     <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.10.14" />
+    <PackageReference Include="Steeltoe.Discovery.Consul" Version="4.1.0" />
     <PackageReference Include="WolverineFx" Version="5.12.1" />
     <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.12.1" />
     <PackageReference Include="WolverineFx.Kafka" Version="5.12.1" />
